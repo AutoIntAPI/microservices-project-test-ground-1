@@ -5,10 +5,10 @@ Handles notifications via email and other channels.
 ## Features
 
 - Email notifications
-- Event-driven notifications
+- Synchronous REST API-based notifications
 - Welcome emails
-- Order confirmations
-- Payment confirmations
+- Order confirmations (triggered by Order Service)
+- Payment confirmations (triggered by Payment Service)
 - Batch notifications
 
 ## Environment Variables
@@ -49,4 +49,11 @@ pytest
 - Python 3.11
 - Flask
 - Redis
-- RabbitMQ
+
+## Communication Pattern
+
+This service receives notification requests via **synchronous REST API calls** from other services:
+- Order Service sends order confirmation requests
+- Payment Service sends payment confirmation requests
+
+No message queue infrastructure is required.

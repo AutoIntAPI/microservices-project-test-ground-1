@@ -38,25 +38,25 @@ services:
       timeout: 3s
       retries: 5
 
-  # RabbitMQ Message Queue
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: ecommerce-rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: ecommerce
-      RABBITMQ_DEFAULT_PASS: ecommerce123
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    networks:
-      - ecommerce-network
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # RabbitMQ Message Queue - DISABLED (using synchronous REST API communication)
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   container_name: ecommerce-rabbitmq
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: ecommerce
+  #     RABBITMQ_DEFAULT_PASS: ecommerce123
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   volumes:
+  #     - rabbitmq_data:/var/lib/rabbitmq
+  #   networks:
+  #     - ecommerce-network
+  #   healthcheck:
+  #     test: ["CMD", "rabbitmq-diagnostics", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
   # User Service
   user-service:
@@ -126,18 +126,16 @@ services:
       - SERVICE_PORT=3003
       - DATABASE_URL=postgresql://ecommerce:ecommerce123@postgres:5432/ecommerce
       - REDIS_URL=redis://redis:6379
-      - RABBITMQ_URL=amqp://ecommerce:ecommerce123@rabbitmq:5672
       - USER_SERVICE_URL=http://user-service:3001
       - PRODUCT_SERVICE_URL=http://product-service:3002
       - PAYMENT_SERVICE_URL=http://payment-service:3004
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3005
     ports:
       - "3003:3003"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -159,15 +157,13 @@ services:
       - SERVICE_PORT=3004
       - DATABASE_URL=postgresql://ecommerce:ecommerce123@postgres:5432/ecommerce
       - REDIS_URL=redis://redis:6379
-      - RABBITMQ_URL=amqp://ecommerce:ecommerce123@rabbitmq:5672
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3005
     ports:
       - "3004:3004"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -188,7 +184,6 @@ services:
       - FLASK_ENV=production
       - SERVICE_PORT=3005
       - REDIS_URL=redis://redis:6379
-      - RABBITMQ_URL=amqp://ecommerce:ecommerce123@rabbitmq:5672
       - SMTP_HOST=smtp.mailtrap.io
       - SMTP_PORT=2525
       - SMTP_USER=your-smtp-user
@@ -198,8 +193,6 @@ services:
       - "3005:3005"
     depends_on:
       redis:
-        condition: service_healthy
-      rabbitmq:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -252,4 +245,4 @@ networks:
 volumes:
   postgres_data:
   redis_data:
-  rabbitmq_data:
+  # rabbitmq_data:  # DISABLED - not using RabbitMQ

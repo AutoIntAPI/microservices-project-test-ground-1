@@ -94,8 +94,8 @@ logs-db:
 logs-redis:
 	@docker-compose logs -f redis
 
-logs-rabbitmq:
-	@docker-compose logs -f rabbitmq
+# logs-rabbitmq:
+# 	@docker-compose logs -f rabbitmq  # DISABLED - RabbitMQ not in use
 
 # Health check
 health:

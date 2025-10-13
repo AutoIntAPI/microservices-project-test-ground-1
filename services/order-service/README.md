@@ -47,4 +47,10 @@ pytest
 - Flask
 - PostgreSQL
 - Redis
-- RabbitMQ
+- Requests (for HTTP communication with other services)
+
+## Service Communication
+
+This service communicates with other services via **synchronous REST API calls**:
+- Product Service: Product validation
+- Notification Service: Order confirmation emails

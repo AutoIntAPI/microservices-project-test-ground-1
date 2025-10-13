@@ -1,8 +1,12 @@
 from flask import Blueprint, request, jsonify
 from app.models.payment import Payment
 from app.utils.logger import logger
+import requests
+import os
 
 bp = Blueprint('payments', __name__)
+
+NOTIFICATION_SERVICE_URL = os.getenv('NOTIFICATION_SERVICE_URL', 'http://notification-service:3005')
 
 def get_user_from_token(request):
     """Extract user ID from Authorization header"""
@@ -36,6 +40,27 @@ def process_payment():
         )
         
         logger.info(f'Payment processed: {transaction["transaction_id"]} - Status: {status}')
+        
+        # Send payment confirmation notification (synchronous REST call)
+        if result['success']:
+            try:
+                notification_payload = {
+                    'type': 'payment_confirmation',
+                    'recipient': user['email'],
+                    'payload': {
+                        'transaction_id': transaction['transaction_id'],
+                        'amount': amount
+                    }
+                }
+                requests.post(
+                    f'{NOTIFICATION_SERVICE_URL}/send',
+                    json=notification_payload,
+                    timeout=5
+                )
+                logger.info(f'Payment confirmation notification sent for transaction {transaction["transaction_id"]}')
+            except requests.RequestException as e:
+                # Log but don't fail the payment if notification fails
+                logger.warning(f'Failed to send payment notification: {str(e)}')
         
         if result['success']:
             return jsonify({

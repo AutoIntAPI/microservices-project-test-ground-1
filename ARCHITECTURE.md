@@ -150,7 +150,7 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Framework: Flask
 - Database: PostgreSQL (orders schema)
 - Cache: Redis
-- Message Queue: RabbitMQ (pika)
+- HTTP Client: Requests
 
 **Port:** 3003
 
@@ -159,8 +159,9 @@ The platform follows a **Microservices Architecture** pattern with the following
 - `orders.order_items`: Order line items
 - `orders.order_status_history`: Order status changes
 
-**External Dependencies:**
+**External Dependencies (via REST API):**
 - Product Service (for product validation)
+- Notification Service (for order confirmations)
 - Payment Service (for payment processing)
 - User Service (for user validation)
 
@@ -178,7 +179,10 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Framework: Flask
 - Database: PostgreSQL (payments schema)
 - Cache: Redis
-- Message Queue: RabbitMQ
+- HTTP Client: Requests
+
+**External Dependencies (via REST API):**
+- Notification Service (for payment confirmations)
 
 **Port:** 3004
 
@@ -195,7 +199,7 @@ The platform follows a **Microservices Architecture** pattern with the following
 
 **Responsibilities:**
 - Email notifications
-- Event-driven notifications
+- REST API-based notifications
 - Welcome emails
 - Order confirmations
 - Payment confirmations
@@ -204,7 +208,6 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Runtime: Python 3.11
 - Framework: Flask
 - Cache: Redis
-- Message Queue: RabbitMQ
 - Email: SMTP (simulated)
 
 **Port:** 3005
@@ -243,45 +246,37 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Rate limiting counters
 - Temporary data storage
 
-### RabbitMQ
+### RabbitMQ (Not Currently Used)
 
-**Purpose:** Asynchronous messaging and event bus
+**Note:** RabbitMQ infrastructure is available but not currently utilized. The system uses synchronous REST API communication instead.
 
-**Use Cases:**
-- Order notifications
-- Payment events
-- Email queue
-- Service-to-service async communication
-
-**Exchange Types:**
-- Direct: For specific routing
-- Topic: For pattern-based routing
-- Fanout: For broadcasting
+**Purpose:** Reserved for future asynchronous messaging if needed
 
 ## Communication Patterns
 
 ### Synchronous Communication (REST)
 
+This system uses **synchronous HTTP REST API communication** for all inter-service interactions.
+
 - **Client → API Gateway**: HTTPS/REST
 - **API Gateway → Services**: HTTP/REST
-- **Service → Service**: HTTP/REST (when needed)
+- **Service → Service**: HTTP/REST
+  - Order Service → Product Service (product validation)
+  - Order Service → Notification Service (order confirmations)
+  - Payment Service → Notification Service (payment confirmations)
 
 **Characteristics:**
 - Request-response pattern
 - Immediate response expected
-- Used for queries and commands requiring immediate feedback
+- Used for all service-to-service communication
+- Simplified debugging and tracing
+- Predictable behavior
 
-### Asynchronous Communication (Message Queue)
-
-- **Service → RabbitMQ → Service**: AMQP
-- Event publishing for cross-service updates
-- Email notifications
-
-**Characteristics:**
-- Fire-and-forget pattern
-- Eventual consistency
-- Decoupled services
-- Resilient to service failures
+**Benefits:**
+- Simpler architecture
+- Easier to test and debug
+- Immediate feedback on operations
+- No message queue infrastructure required
 
 ## Security
 
@@ -470,12 +465,17 @@ GitHub Actions workflow:
 - Session management
 - Rate limiting
 
-### Why RabbitMQ?
+### Why Synchronous REST API Communication?
 
-- Reliable message delivery
-- Flexible routing
-- Easy to set up
-- Good documentation
+The system uses synchronous REST API communication for the following reasons:
+
+- **Simplicity**: Easier to understand and debug
+- **Immediate Feedback**: Know instantly if operations succeed or fail
+- **Request-Response Pattern**: Natural fit for most operations
+- **Lower Complexity**: No message queue infrastructure to manage
+- **Better Traceability**: Direct request chains are easier to trace
+
+RabbitMQ infrastructure is available but disabled for potential future use if asynchronous patterns are needed.
 
 ## Conclusion
 

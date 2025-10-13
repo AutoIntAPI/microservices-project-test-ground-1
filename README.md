@@ -62,19 +62,31 @@ This project implements a microservices architecture for an e-commerce platform 
 
 ### 6. Notification Service (Port 3005)
 - Email notifications
-- Order confirmation emails
+- Order confirmation emails (triggered by Order Service)
+- Payment confirmation emails (triggered by Payment Service)
 - User registration emails
-- Event-driven notifications
+- REST API-based notifications
 
 ## Technology Stack
 
-- **Languages**: Python (Flask/FastAPI), Node.js (Express)
+- **Languages**: Python (Flask), Node.js (Express)
 - **Databases**: PostgreSQL, Redis
-- **Message Queue**: RabbitMQ (for async communication)
+- **Communication**: Synchronous REST API calls (HTTP/JSON)
 - **Containerization**: Docker, Docker Compose
 - **API Gateway**: Node.js/Express
 - **CI/CD**: GitHub Actions
 - **Monitoring**: Prometheus, Grafana (configuration included)
+
+## Communication Pattern
+
+This project uses **synchronous REST API communication** between microservices:
+- All services communicate via HTTP REST APIs
+- Order Service → Product Service (product validation)
+- Order Service → Notification Service (order confirmations)
+- Payment Service → Notification Service (payment confirmations)
+- API Gateway → All Services (request routing)
+
+RabbitMQ infrastructure is available but not currently used, allowing for future async patterns if needed.
 
 ## Project Structure
 
@@ -233,7 +245,9 @@ Key environment variables:
 - `REDIS_URL`: Redis connection string
 - `JWT_SECRET`: Secret for JWT token generation
 - `SERVICE_PORT`: Port for the service to listen on
-- `RABBITMQ_URL`: RabbitMQ connection string
+- `NOTIFICATION_SERVICE_URL`: Notification service URL (for order/payment services)
+- `PRODUCT_SERVICE_URL`: Product service URL (for order service)
+- `USER_SERVICE_URL`: User service URL (for API gateway)
 
 ## Monitoring and Logging
 

@@ -8,6 +8,7 @@ bp = Blueprint('orders', __name__)
 
 PRODUCT_SERVICE_URL = os.getenv('PRODUCT_SERVICE_URL', 'http://product-service:3002')
 PAYMENT_SERVICE_URL = os.getenv('PAYMENT_SERVICE_URL', 'http://payment-service:3004')
+NOTIFICATION_SERVICE_URL = os.getenv('NOTIFICATION_SERVICE_URL', 'http://notification-service:3005')
 
 def get_user_from_token(request):
     """Extract user ID from Authorization header (handled by API Gateway)"""
@@ -81,6 +82,26 @@ def create_order():
         order = Order.create(user['id'], order_items, total_amount, shipping_address_id)
         
         logger.info(f'Order created: {order["id"]} for user {user["id"]}')
+        
+        # Send order confirmation notification (synchronous REST call)
+        try:
+            notification_payload = {
+                'type': 'order_confirmation',
+                'recipient': user['email'],
+                'payload': {
+                    'order_id': order['id'],
+                    'total_amount': total_amount
+                }
+            }
+            requests.post(
+                f'{NOTIFICATION_SERVICE_URL}/send',
+                json=notification_payload,
+                timeout=5
+            )
+            logger.info(f'Order confirmation notification sent for order {order["id"]}')
+        except requests.RequestException as e:
+            # Log but don't fail the order creation if notification fails
+            logger.warning(f'Failed to send order notification: {str(e)}')
         
         return jsonify({
             'message': 'Order created successfully',
