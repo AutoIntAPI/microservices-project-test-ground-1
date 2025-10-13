@@ -51,9 +51,10 @@ A comprehensive, production-ready e-commerce platform built with microservices a
 
 6. **Notification Service** (Python/Flask - Port 3005)
    - Email notifications
-   - Event-driven messaging
+   - REST API-based messaging
    - Welcome emails
    - Order confirmations
+   - Payment confirmations
 
 ### Infrastructure Services
 
@@ -67,10 +68,9 @@ A comprehensive, production-ready e-commerce platform built with microservices a
    - Session storage
    - Rate limiting
 
-3. **RabbitMQ** (Port 5672, Management: 15672)
-   - Message queue
-   - Async communication
-   - Event bus
+3. **RabbitMQ** (Port 5672, Management: 15672) - *Currently Disabled*
+   - Reserved for future async communication
+   - System uses synchronous REST API calls instead
 
 ## Architecture Highlights
 
@@ -78,7 +78,7 @@ A comprehensive, production-ready e-commerce platform built with microservices a
 - API Gateway Pattern
 - Database per Service
 - Circuit Breaker
-- Event-Driven Architecture
+- Synchronous REST API Communication
 - CQRS (partial implementation)
 - Health Check Pattern
 
@@ -140,7 +140,7 @@ A comprehensive, production-ready e-commerce platform built with microservices a
 ### Data Layer
 - **PostgreSQL 15**: Relational database
 - **Redis 7**: Caching and session store
-- **RabbitMQ 3**: Message queue
+- **RabbitMQ 3**: Available but not used (system uses REST API communication)
 
 ### DevOps
 - **Docker**: Containerization
@@ -152,7 +152,7 @@ A comprehensive, production-ready e-commerce platform built with microservices a
 - **jsonwebtoken**: JWT authentication
 - **winston**: Logging (Node.js)
 - **psycopg2**: PostgreSQL adapter (Python)
-- **pika**: RabbitMQ client (Python)
+- **requests**: HTTP client for service-to-service communication (Python)
 - **gunicorn**: WSGI server (Python)
 
 ## Features

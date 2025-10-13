@@ -195,7 +195,7 @@ The platform follows a **Microservices Architecture** pattern with the following
 
 **Responsibilities:**
 - Email notifications
-- Event-driven notifications
+- REST API-based notifications
 - Welcome emails
 - Order confirmations
 - Payment confirmations
@@ -204,7 +204,6 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Runtime: Python 3.11
 - Framework: Flask
 - Cache: Redis
-- Message Queue: RabbitMQ
 - Email: SMTP (simulated)
 
 **Port:** 3005
@@ -243,45 +242,37 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Rate limiting counters
 - Temporary data storage
 
-### RabbitMQ
+### RabbitMQ (Not Currently Used)
 
-**Purpose:** Asynchronous messaging and event bus
+**Note:** RabbitMQ infrastructure is available but not currently utilized. The system uses synchronous REST API communication instead.
 
-**Use Cases:**
-- Order notifications
-- Payment events
-- Email queue
-- Service-to-service async communication
-
-**Exchange Types:**
-- Direct: For specific routing
-- Topic: For pattern-based routing
-- Fanout: For broadcasting
+**Purpose:** Reserved for future asynchronous messaging if needed
 
 ## Communication Patterns
 
 ### Synchronous Communication (REST)
 
+This system uses **synchronous HTTP REST API communication** for all inter-service interactions.
+
 - **Client → API Gateway**: HTTPS/REST
 - **API Gateway → Services**: HTTP/REST
-- **Service → Service**: HTTP/REST (when needed)
+- **Service → Service**: HTTP/REST
+  - Order Service → Product Service (product validation)
+  - Order Service → Notification Service (order confirmations)
+  - Payment Service → Notification Service (payment confirmations)
 
 **Characteristics:**
 - Request-response pattern
 - Immediate response expected
-- Used for queries and commands requiring immediate feedback
+- Used for all service-to-service communication
+- Simplified debugging and tracing
+- Predictable behavior
 
-### Asynchronous Communication (Message Queue)
-
-- **Service → RabbitMQ → Service**: AMQP
-- Event publishing for cross-service updates
-- Email notifications
-
-**Characteristics:**
-- Fire-and-forget pattern
-- Eventual consistency
-- Decoupled services
-- Resilient to service failures
+**Benefits:**
+- Simpler architecture
+- Easier to test and debug
+- Immediate feedback on operations
+- No message queue infrastructure required
 
 ## Security
 
