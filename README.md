@@ -245,7 +245,9 @@ Key environment variables:
 - `REDIS_URL`: Redis connection string
 - `JWT_SECRET`: Secret for JWT token generation
 - `SERVICE_PORT`: Port for the service to listen on
-- `RABBITMQ_URL`: RabbitMQ connection string
+- `NOTIFICATION_SERVICE_URL`: Notification service URL (for order/payment services)
+- `PRODUCT_SERVICE_URL`: Product service URL (for order service)
+- `USER_SERVICE_URL`: User service URL (for API gateway)
 
 ## Monitoring and Logging
 

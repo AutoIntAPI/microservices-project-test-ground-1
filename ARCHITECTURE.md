@@ -150,7 +150,7 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Framework: Flask
 - Database: PostgreSQL (orders schema)
 - Cache: Redis
-- Message Queue: RabbitMQ (pika)
+- HTTP Client: Requests
 
 **Port:** 3003
 
@@ -159,8 +159,9 @@ The platform follows a **Microservices Architecture** pattern with the following
 - `orders.order_items`: Order line items
 - `orders.order_status_history`: Order status changes
 
-**External Dependencies:**
+**External Dependencies (via REST API):**
 - Product Service (for product validation)
+- Notification Service (for order confirmations)
 - Payment Service (for payment processing)
 - User Service (for user validation)
 
@@ -178,7 +179,10 @@ The platform follows a **Microservices Architecture** pattern with the following
 - Framework: Flask
 - Database: PostgreSQL (payments schema)
 - Cache: Redis
-- Message Queue: RabbitMQ
+- HTTP Client: Requests
+
+**External Dependencies (via REST API):**
+- Notification Service (for payment confirmations)
 
 **Port:** 3004
 
@@ -461,12 +465,17 @@ GitHub Actions workflow:
 - Session management
 - Rate limiting
 
-### Why RabbitMQ?
+### Why Synchronous REST API Communication?
 
-- Reliable message delivery
-- Flexible routing
-- Easy to set up
-- Good documentation
+The system uses synchronous REST API communication for the following reasons:
+
+- **Simplicity**: Easier to understand and debug
+- **Immediate Feedback**: Know instantly if operations succeed or fail
+- **Request-Response Pattern**: Natural fit for most operations
+- **Lower Complexity**: No message queue infrastructure to manage
+- **Better Traceability**: Direct request chains are easier to trace
+
+RabbitMQ infrastructure is available but disabled for potential future use if asynchronous patterns are needed.
 
 ## Conclusion
 

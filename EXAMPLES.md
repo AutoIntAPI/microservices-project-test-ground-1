@@ -348,7 +348,7 @@ docker-compose logs -f notification-service
 # Database logs
 docker-compose logs -f postgres
 docker-compose logs -f redis
-docker-compose logs -f rabbitmq
+# docker-compose logs -f rabbitmq  # RabbitMQ is disabled
 ```
 
 ### Check Database
@@ -376,11 +376,15 @@ KEYS *
 GET some_key
 ```
 
-### Check RabbitMQ
+### Check RabbitMQ (Optional - Currently Disabled)
 
-Access RabbitMQ Management UI: http://localhost:15672
-- Username: ecommerce
-- Password: ecommerce123
+RabbitMQ is available but not currently used. The system uses synchronous REST API communication.
+
+If you need to enable RabbitMQ:
+1. Uncomment the rabbitmq service in docker-compose.yml
+2. Access RabbitMQ Management UI: http://localhost:15672
+   - Username: ecommerce
+   - Password: ecommerce123
 
 ## API Documentation
 
