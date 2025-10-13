@@ -1,0 +1,17 @@
+**/.git
+**/.gitignore
+**/node_modules
+**/npm-debug.log
+**/.env
+**/.env.local
+**/.vscode
+**/.idea
+**/README.md
+**/docker-compose*.yml
+**/Dockerfile*
+**/.dockerignore
+**/coverage
+**/.pytest_cache
+**/__pycache__
+**/venv
+**/logs
