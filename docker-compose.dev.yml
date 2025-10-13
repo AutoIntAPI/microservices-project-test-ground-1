@@ -1,0 +1,184 @@
+version: '3.8'
+
+# Development environment with hot-reload and debug capabilities
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    ports:
+      - "5432:5432"
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+
+  rabbitmq:
+    extends:
+      file: docker-compose.yml
+      service: rabbitmq
+
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile.dev
+    container_name: user-service-dev
+    environment:
+      - NODE_ENV=development
+      - SERVICE_PORT=3001
+      - DATABASE_URL=postgresql://ecommerce:ecommerce123@postgres:5432/ecommerce
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=dev-secret-key
+    ports:
+      - "3001:3001"
+      - "9229:9229"  # Node.js debugger
+    volumes:
+      - ./services/user-service:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ecommerce-network
+    command: npm run dev
+
+  product-service:
+    build:
+      context: ./services/product-service
+      dockerfile: Dockerfile.dev
+    container_name: product-service-dev
+    environment:
+      - NODE_ENV=development
+      - SERVICE_PORT=3002
+      - DATABASE_URL=postgresql://ecommerce:ecommerce123@postgres:5432/ecommerce
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3002:3002"
+      - "9230:9229"
+    volumes:
+      - ./services/product-service:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - ecommerce-network
+    command: npm run dev
+
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile.dev
+    container_name: order-service-dev
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SERVICE_PORT=3003
+      - DATABASE_URL=postgresql://ecommerce:ecommerce123@postgres:5432/ecommerce
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://ecommerce:ecommerce123@rabbitmq:5672
+      - USER_SERVICE_URL=http://user-service:3001
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+      - PAYMENT_SERVICE_URL=http://payment-service:3004
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./services/order-service:/app
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - ecommerce-network
+    command: flask run --host=0.0.0.0 --port=3003
+
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile.dev
+    container_name: payment-service-dev
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SERVICE_PORT=3004
+      - DATABASE_URL=postgresql://ecommerce:ecommerce123@postgres:5432/ecommerce
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://ecommerce:ecommerce123@rabbitmq:5672
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./services/payment-service:/app
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - ecommerce-network
+    command: flask run --host=0.0.0.0 --port=3004
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile.dev
+    container_name: notification-service-dev
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SERVICE_PORT=3005
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://ecommerce:ecommerce123@rabbitmq:5672
+      - SMTP_HOST=smtp.mailtrap.io
+      - SMTP_PORT=2525
+      - EMAIL_FROM=noreply@ecommerce.com
+    ports:
+      - "3005:3005"
+    volumes:
+      - ./services/notification-service:/app
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - ecommerce-network
+    command: flask run --host=0.0.0.0 --port=3005
+
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile.dev
+    container_name: api-gateway-dev
+    environment:
+      - NODE_ENV=development
+      - SERVICE_PORT=8000
+      - USER_SERVICE_URL=http://user-service:3001
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+      - ORDER_SERVICE_URL=http://order-service:3003
+      - PAYMENT_SERVICE_URL=http://payment-service:3004
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3005
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=dev-secret-key
+    ports:
+      - "8000:8000"
+      - "9231:9229"
+    volumes:
+      - ./services/api-gateway:/app
+      - /app/node_modules
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+      - payment-service
+      - notification-service
+    networks:
+      - ecommerce-network
+    command: npm run dev
+
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
