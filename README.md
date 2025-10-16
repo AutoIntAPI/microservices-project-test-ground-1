@@ -252,12 +252,16 @@ python3 scripts/extract_api_calls.py
 
 # Validate the extraction
 python3 scripts/test_extraction.py
+
+# Generate a human-readable summary
+python3 scripts/generate_api_summary.py
 ```
 
 The tool generates output in `api_extraction_output/`:
 - **api_calls.csv** - CSV format for data analysis
 - **api_calls.json** - JSON format for programmatic access
 - **api_calls.xlsx** - Excel format with formatting
+- **API_CALL_SUMMARY.md** - Human-readable markdown summary
 
 ### What It Extracts
 
