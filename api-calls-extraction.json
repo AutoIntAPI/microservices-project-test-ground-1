@@ -1,0 +1,600 @@
+{
+	"metadata": {
+		"generated_date": "2025-10-16",
+		"repository": "microservices-project-test-ground",
+		"total_calls": 23,
+		"communication_pattern": "synchronous_rest_http",
+		"message_broker_used": false
+	},
+	"api_calls": [
+		{
+			"id": 1,
+			"source": {
+				"service": "order-service",
+				"file": "services/order-service/app/routes/orders.py",
+				"line": 57,
+				"function": "create_order",
+				"language": "python"
+			},
+			"destination": {
+				"service": "product-service",
+				"endpoint": "/{product_id}",
+				"base_url_env": "PRODUCT_SERVICE_URL",
+				"default_url": "http://product-service:3002"
+			},
+			"request": {
+				"method": "GET",
+				"type": "synchronous",
+				"timeout": 5,
+				"authentication": false
+			},
+			"purpose": "Validate product and check stock during order creation",
+			"error_handling": "critical",
+			"code_snippet": "response = requests.get(f'{PRODUCT_SERVICE_URL}/{product_id}', timeout=5)"
+		},
+		{
+			"id": 2,
+			"source": {
+				"service": "order-service",
+				"file": "services/order-service/app/routes/orders.py",
+				"line": 96,
+				"function": "create_order",
+				"language": "python"
+			},
+			"destination": {
+				"service": "notification-service",
+				"endpoint": "/send",
+				"base_url_env": "NOTIFICATION_SERVICE_URL",
+				"default_url": "http://notification-service:3005"
+			},
+			"request": {
+				"method": "POST",
+				"type": "synchronous",
+				"timeout": 5,
+				"authentication": false,
+				"payload_type": "order_confirmation"
+			},
+			"purpose": "Send order confirmation notification after order creation",
+			"error_handling": "non_critical",
+			"code_snippet": "requests.post(f'{NOTIFICATION_SERVICE_URL}/send', json=notification_payload, timeout=5)"
+		},
+		{
+			"id": 3,
+			"source": {
+				"service": "payment-service",
+				"file": "services/payment-service/app/routes/payments.py",
+				"line": 55,
+				"function": "process_payment",
+				"language": "python"
+			},
+			"destination": {
+				"service": "notification-service",
+				"endpoint": "/send",
+				"base_url_env": "NOTIFICATION_SERVICE_URL",
+				"default_url": "http://notification-service:3005"
+			},
+			"request": {
+				"method": "POST",
+				"type": "synchronous",
+				"timeout": 5,
+				"authentication": false,
+				"payload_type": "payment_confirmation"
+			},
+			"purpose": "Send payment confirmation notification after successful payment",
+			"error_handling": "non_critical",
+			"code_snippet": "requests.post(f'{NOTIFICATION_SERVICE_URL}/send', json=notification_payload, timeout=5)"
+		},
+		{
+			"id": 4,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/users.js",
+				"line": 9,
+				"function": "router.post",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "user-service",
+				"endpoint": "/register",
+				"base_url_env": "USER_SERVICE_URL",
+				"default_url": "http://user-service:3001"
+			},
+			"request": {
+				"method": "POST",
+				"type": "proxy",
+				"authentication": false
+			},
+			"purpose": "Proxy user registration request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.post('/register', createServiceProxy('user-service', USER_SERVICE_URL))"
+		},
+		{
+			"id": 5,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/users.js",
+				"line": 10,
+				"function": "router.post",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "user-service",
+				"endpoint": "/login",
+				"base_url_env": "USER_SERVICE_URL",
+				"default_url": "http://user-service:3001"
+			},
+			"request": {
+				"method": "POST",
+				"type": "proxy",
+				"authentication": false
+			},
+			"purpose": "Proxy user login request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.post('/login', createServiceProxy('user-service', USER_SERVICE_URL))"
+		},
+		{
+			"id": 6,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/users.js",
+				"line": 13,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "user-service",
+				"endpoint": "/me",
+				"base_url_env": "USER_SERVICE_URL",
+				"default_url": "http://user-service:3001"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy get user profile request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/me', authenticate, createServiceProxy('user-service', USER_SERVICE_URL))"
+		},
+		{
+			"id": 7,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/users.js",
+				"line": 14,
+				"function": "router.put",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "user-service",
+				"endpoint": "/me",
+				"base_url_env": "USER_SERVICE_URL",
+				"default_url": "http://user-service:3001"
+			},
+			"request": {
+				"method": "PUT",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy update user profile request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.put('/me', authenticate, createServiceProxy('user-service', USER_SERVICE_URL))"
+		},
+		{
+			"id": 8,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/users.js",
+				"line": 15,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "user-service",
+				"endpoint": "/me/addresses",
+				"base_url_env": "USER_SERVICE_URL",
+				"default_url": "http://user-service:3001"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy get user addresses request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/me/addresses', authenticate, createServiceProxy('user-service', USER_SERVICE_URL))"
+		},
+		{
+			"id": 9,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/users.js",
+				"line": 16,
+				"function": "router.post",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "user-service",
+				"endpoint": "/me/addresses",
+				"base_url_env": "USER_SERVICE_URL",
+				"default_url": "http://user-service:3001"
+			},
+			"request": {
+				"method": "POST",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy add user address request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.post('/me/addresses', authenticate, createServiceProxy('user-service', USER_SERVICE_URL))"
+		},
+		{
+			"id": 10,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/products.js",
+				"line": 9,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "product-service",
+				"endpoint": "/",
+				"base_url_env": "PRODUCT_SERVICE_URL",
+				"default_url": "http://product-service:3002"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": false
+			},
+			"purpose": "Proxy get all products request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/', createServiceProxy('product-service', PRODUCT_SERVICE_URL))"
+		},
+		{
+			"id": 11,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/products.js",
+				"line": 10,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "product-service",
+				"endpoint": "/{id}",
+				"base_url_env": "PRODUCT_SERVICE_URL",
+				"default_url": "http://product-service:3002"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": false
+			},
+			"purpose": "Proxy get product by ID request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/:id', createServiceProxy('product-service', PRODUCT_SERVICE_URL))"
+		},
+		{
+			"id": 12,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/products.js",
+				"line": 11,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "product-service",
+				"endpoint": "/category/{categoryId}",
+				"base_url_env": "PRODUCT_SERVICE_URL",
+				"default_url": "http://product-service:3002"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": false
+			},
+			"purpose": "Proxy get products by category request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/category/:categoryId', createServiceProxy('product-service', PRODUCT_SERVICE_URL))"
+		},
+		{
+			"id": 13,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/products.js",
+				"line": 12,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "product-service",
+				"endpoint": "/{id}/reviews",
+				"base_url_env": "PRODUCT_SERVICE_URL",
+				"default_url": "http://product-service:3002"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": false
+			},
+			"purpose": "Proxy get product reviews request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/:id/reviews', createServiceProxy('product-service', PRODUCT_SERVICE_URL))"
+		},
+		{
+			"id": 14,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/products.js",
+				"line": 15,
+				"function": "router.post",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "product-service",
+				"endpoint": "/{id}/reviews",
+				"base_url_env": "PRODUCT_SERVICE_URL",
+				"default_url": "http://product-service:3002"
+			},
+			"request": {
+				"method": "POST",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy add product review request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.post('/:id/reviews', authenticate, createServiceProxy('product-service', PRODUCT_SERVICE_URL))"
+		},
+		{
+			"id": 15,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/orders.js",
+				"line": 11,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "order-service",
+				"endpoint": "/",
+				"base_url_env": "ORDER_SERVICE_URL",
+				"default_url": "http://order-service:3003"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy get user orders request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/', createServiceProxy('order-service', ORDER_SERVICE_URL))"
+		},
+		{
+			"id": 16,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/orders.js",
+				"line": 12,
+				"function": "router.post",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "order-service",
+				"endpoint": "/",
+				"base_url_env": "ORDER_SERVICE_URL",
+				"default_url": "http://order-service:3003"
+			},
+			"request": {
+				"method": "POST",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy create order request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.post('/', createServiceProxy('order-service', ORDER_SERVICE_URL))"
+		},
+		{
+			"id": 17,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/orders.js",
+				"line": 13,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "order-service",
+				"endpoint": "/{id}",
+				"base_url_env": "ORDER_SERVICE_URL",
+				"default_url": "http://order-service:3003"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy get order by ID request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/:id', createServiceProxy('order-service', ORDER_SERVICE_URL))"
+		},
+		{
+			"id": 18,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/orders.js",
+				"line": 14,
+				"function": "router.put",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "order-service",
+				"endpoint": "/{id}/cancel",
+				"base_url_env": "ORDER_SERVICE_URL",
+				"default_url": "http://order-service:3003"
+			},
+			"request": {
+				"method": "PUT",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy cancel order request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.put('/:id/cancel', createServiceProxy('order-service', ORDER_SERVICE_URL))"
+		},
+		{
+			"id": 19,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/payments.js",
+				"line": 11,
+				"function": "router.post",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "payment-service",
+				"endpoint": "/process",
+				"base_url_env": "PAYMENT_SERVICE_URL",
+				"default_url": "http://payment-service:3004"
+			},
+			"request": {
+				"method": "POST",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy process payment request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.post('/process', createServiceProxy('payment-service', PAYMENT_SERVICE_URL))"
+		},
+		{
+			"id": 20,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/payments.js",
+				"line": 12,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "payment-service",
+				"endpoint": "/transactions",
+				"base_url_env": "PAYMENT_SERVICE_URL",
+				"default_url": "http://payment-service:3004"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy get user transactions request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/transactions', createServiceProxy('payment-service', PAYMENT_SERVICE_URL))"
+		},
+		{
+			"id": 21,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/payments.js",
+				"line": 13,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "payment-service",
+				"endpoint": "/transactions/{id}",
+				"base_url_env": "PAYMENT_SERVICE_URL",
+				"default_url": "http://payment-service:3004"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy get transaction by ID request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/transactions/:id', createServiceProxy('payment-service', PAYMENT_SERVICE_URL))"
+		},
+		{
+			"id": 22,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/payments.js",
+				"line": 14,
+				"function": "router.post",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "payment-service",
+				"endpoint": "/methods",
+				"base_url_env": "PAYMENT_SERVICE_URL",
+				"default_url": "http://payment-service:3004"
+			},
+			"request": {
+				"method": "POST",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy add payment method request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.post('/methods', createServiceProxy('payment-service', PAYMENT_SERVICE_URL))"
+		},
+		{
+			"id": 23,
+			"source": {
+				"service": "api-gateway",
+				"file": "services/api-gateway/src/routes/payments.js",
+				"line": 15,
+				"function": "router.get",
+				"language": "javascript"
+			},
+			"destination": {
+				"service": "payment-service",
+				"endpoint": "/methods",
+				"base_url_env": "PAYMENT_SERVICE_URL",
+				"default_url": "http://payment-service:3004"
+			},
+			"request": {
+				"method": "GET",
+				"type": "proxy",
+				"authentication": true
+			},
+			"purpose": "Proxy get payment methods request",
+			"error_handling": "proxy_standard",
+			"code_snippet": "router.get('/methods', createServiceProxy('payment-service', PAYMENT_SERVICE_URL))"
+		}
+	],
+	"service_statistics": {
+		"api-gateway": {
+			"outbound_calls": 20,
+			"inbound_calls": 0,
+			"role": "proxy"
+		},
+		"order-service": {
+			"outbound_calls": 2,
+			"inbound_calls": 4,
+			"role": "business_logic"
+		},
+		"payment-service": {
+			"outbound_calls": 1,
+			"inbound_calls": 5,
+			"role": "business_logic"
+		},
+		"product-service": {
+			"outbound_calls": 0,
+			"inbound_calls": 6,
+			"role": "data_provider"
+		},
+		"user-service": {
+			"outbound_calls": 0,
+			"inbound_calls": 6,
+			"role": "data_provider"
+		},
+		"notification-service": {
+			"outbound_calls": 0,
+			"inbound_calls": 2,
+			"role": "utility"
+		}
+	}
+}
