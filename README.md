@@ -236,6 +236,37 @@ API documentation is available at:
 - Swagger UI: http://localhost:8000/api-docs
 - Each service also exposes its own API docs at `/api-docs`
 
+## API Extraction Tool
+
+This repository includes a powerful tool to automatically extract all REST API calls from the microservices codebase. This is useful for:
+- Training AI/ML models on API extraction patterns
+- Validating model accuracy against ground truth data
+- Documenting microservices communication patterns
+- Analyzing inter-service dependencies
+
+### Usage
+
+```bash
+# Extract all API calls to CSV, JSON, and Excel formats
+python3 scripts/extract_api_calls.py
+
+# Validate the extraction
+python3 scripts/test_extraction.py
+```
+
+The tool generates output in `api_extraction_output/`:
+- **api_calls.csv** - CSV format for data analysis
+- **api_calls.json** - JSON format for programmatic access
+- **api_calls.xlsx** - Excel format with formatting
+
+### What It Extracts
+
+- **API Gateway Proxy Routes**: Maps client-facing endpoints to backend services
+- **Inter-Service REST Calls**: Direct API calls between microservices (e.g., Order → Product, Payment → Notification)
+- **Service Endpoint Definitions**: All exposed REST endpoints in each microservice
+
+See [scripts/API_EXTRACTION_README.md](scripts/API_EXTRACTION_README.md) for detailed documentation.
+
 ## Environment Variables
 
 Each service requires specific environment variables. Example `.env` files are provided in each service directory as `.env.example`.
