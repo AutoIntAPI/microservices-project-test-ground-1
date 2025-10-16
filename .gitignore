@@ -49,3 +49,6 @@
 # Temporary files
 **/tmp/
 **/temp/
+
+# API extraction output
+api_extraction_output/
