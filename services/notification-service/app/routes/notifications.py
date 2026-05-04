@@ -12,6 +12,7 @@ def send_notification():
         
         notification_type = data.get('type')
         recipient = data.get('recipient')
+        priority = data.get('priority', 'normal')
         payload = data.get('payload', {})
         
         if not notification_type or not recipient:
@@ -45,10 +46,11 @@ def send_notification():
         else:
             return jsonify({'error': f'Unknown notification type: {notification_type}'}), 400
         
-        logger.info(f'Notification sent: {notification_type} to {recipient}')
+        logger.info(f'Notification sent: {notification_type} to {recipient} with priority {priority}')
         
         return jsonify({
             'message': 'Notification sent successfully',
+            'priority': priority,
             'result': result
         }), 200
         
@@ -56,37 +58,26 @@ def send_notification():
         logger.error(f'Send notification error: {str(e)}')
         return jsonify({'error': 'Failed to send notification'}), 500
 
-@bp.route('/batch', methods=['POST'])
-def send_batch_notifications():
+@bp.route('/audit', methods=['POST'])
+def record_audit_event():
     try:
         data = request.json
-        notifications = data.get('notifications', [])
+        event = data.get('event')
+        source = data.get('source', 'unknown')
+        details = data.get('details', {})
         
-        if not notifications:
-            return jsonify({'error': 'No notifications provided'}), 400
+        if not event:
+            return jsonify({'error': 'Missing required fields'}), 400
         
-        results = []
-        for notification in notifications:
-            try:
-                # Process each notification
-                # This is simplified; in production, you'd use a queue
-                results.append({
-                    'recipient': notification.get('recipient'),
-                    'status': 'sent'
-                })
-            except Exception as e:
-                results.append({
-                    'recipient': notification.get('recipient'),
-                    'status': 'failed',
-                    'error': str(e)
-                })
+        logger.info(f'Audit event recorded: {event} from {source}')
         
         return jsonify({
-            'message': 'Batch notifications processed',
-            'results': results,
-            'total': len(results)
+            'message': 'Audit event recorded successfully',
+            'event': event,
+            'source': source,
+            'details': details
         }), 200
         
     except Exception as e:
-        logger.error(f'Batch notification error: {str(e)}')
-        return jsonify({'error': 'Failed to process batch notifications'}), 500
+        logger.error(f'Audit event error: {str(e)}')
+        return jsonify({'error': 'Failed to record audit event'}), 500
