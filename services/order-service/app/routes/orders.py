@@ -102,6 +102,25 @@ def create_order():
         except requests.RequestException as e:
             # Log but don't fail the order creation if notification fails
             logger.warning(f'Failed to send order notification: {str(e)}')
+
+        try:
+            audit_payload = {
+                'event': 'order_created',
+                'source': 'order-service',
+                'details': {
+                    'order_id': order['id'],
+                    'user_id': user['id'],
+                    'total_amount': total_amount
+                }
+            }
+            requests.post(
+                f'{NOTIFICATION_SERVICE_URL}/audit',
+                json=audit_payload,
+                timeout=5
+            )
+            logger.info(f'Order audit event recorded for order {order["id"]}')
+        except requests.RequestException as e:
+            logger.warning(f'Failed to record order audit event: {str(e)}')
         
         return jsonify({
             'message': 'Order created successfully',
