@@ -27,21 +27,21 @@ class ProductController {
     }
   }
 
-  static async getProduct(req, res) {
-    try {
-      const { id } = req.params;
-      const product = await Product.getById(id);
+  // static async getProduct(req, res) {
+  //   try {
+  //     const { id } = req.params;
+  //     const product = await Product.getById(id);
       
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
+  //     if (!product) {
+  //       return res.status(404).json({ error: 'Product not found' });
+  //     }
       
-      res.json({ product });
-    } catch (error) {
-      logger.error('Get product error:', error);
-      res.status(500).json({ error: 'Failed to fetch product' });
-    }
-  }
+  //     res.json({ product });
+  //   } catch (error) {
+  //     logger.error('Get product error:', error);
+  //     res.status(500).json({ error: 'Failed to fetch product' });
+  //   }
+  // }
 
   static async getProductsByCategory(req, res) {
     try {

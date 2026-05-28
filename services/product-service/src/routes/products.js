@@ -16,7 +16,7 @@ const authenticate = (req, res, next) => {
 router.get('/', ProductController.getProducts);
 router.get('/categories', ProductController.getCategories);
 router.get('/category/:categoryId', ProductController.getProductsByCategory);
-router.get('/:id', ProductController.getProduct);
+// router.get('/:id', ProductController.getProduct);
 router.get('/:id/reviews', ProductController.getReviews);
 router.post('/:id/reviews', authenticate, ProductController.addReview);
 
