@@ -135,10 +135,10 @@ paths:
             schema:
               type: object
               required:
-                - email
+                - username
                 - password
               properties:
-                email:
+                username:
                   type: string
                 password:
                   type: string
