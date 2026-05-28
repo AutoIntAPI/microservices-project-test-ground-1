@@ -11,6 +11,7 @@ def send_notification():
         data = request.json
         
         notification_type = data.get('type')
+        date = data.get('date')
         recipient = data.get('recipient')
         payload = data.get('payload', {})
         
