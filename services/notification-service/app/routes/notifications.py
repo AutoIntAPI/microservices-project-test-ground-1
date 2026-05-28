@@ -15,7 +15,7 @@ def send_notification():
         recipient = data.get('recipient')
         payload = data.get('payload', {})
         
-        if not notification_type or not recipient:
+        if not notification_type or not recipient or not date:
             return jsonify({'error': 'Missing required fields'}), 400
         
         result = None
