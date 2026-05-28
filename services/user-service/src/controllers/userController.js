@@ -8,7 +8,7 @@ const JWT_EXPIRY = '24h';
 class UserController {
   static async register(req, res) {
     try {
-      const { email, password, name, phone } = req.body;
+      const { email, password, name } = req.body;
 
       // Validate input
       if (!email || !password || !name) {
@@ -27,7 +27,7 @@ class UserController {
       }
 
       // Create user
-      const user = await User.create({ email, password, name, phone });
+      const user = await User.create({ email, password, name });
       
       // Generate token
       const token = jwt.sign(
