@@ -97,6 +97,7 @@ paths:
                 - email
                 - password
                 - name
+                - phone
               properties:
                 email:
                   type: string
