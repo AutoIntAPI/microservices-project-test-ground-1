@@ -140,6 +140,8 @@ paths:
               properties:
                 username:
                   type: string
+                  description: Unique login username.
+                  example: jane.doe
                 password:
                   type: string
       responses:
