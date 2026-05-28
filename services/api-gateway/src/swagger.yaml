@@ -49,7 +49,7 @@ components:
           format: float
         sku:
           type: string
-        stock_quantity:
+        inventory_count:
           type: integer
         category_id:
           type: integer

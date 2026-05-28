@@ -1,6 +1,18 @@
 const Product = require('../models/Product');
 const logger = require('../utils/logger');
 
+const mapProductInventoryField = (product) => {
+  if (!product) {
+    return product;
+  }
+
+  const { stock_quantity, ...rest } = product;
+  return {
+    ...rest,
+    inventory_count: stock_quantity
+  };
+};
+
 class ProductController {
   static async getProducts(req, res) {
     try {
@@ -14,10 +26,11 @@ class ProductController {
       };
       
       const products = await Product.getAll(filters);
+      const mappedProducts = products.map(mapProductInventoryField);
       
       res.json({
-        products,
-        count: products.length,
+        products: mappedProducts,
+        count: mappedProducts.length,
         limit: filters.limit,
         offset: filters.offset
       });
@@ -31,12 +44,13 @@ class ProductController {
     try {
       const { id } = req.params;
       const product = await Product.getById(id);
+      const mappedProduct = mapProductInventoryField(product);
       
-      if (!product) {
+      if (!mappedProduct) {
         return res.status(404).json({ error: 'Product not found' });
       }
       
-      res.json({ product });
+      res.json({ product: mappedProduct });
     } catch (error) {
       logger.error('Get product error:', error);
       res.status(500).json({ error: 'Failed to fetch product' });
@@ -47,10 +61,11 @@ class ProductController {
     try {
       const { categoryId } = req.params;
       const products = await Product.getByCategory(categoryId);
+      const mappedProducts = products.map(mapProductInventoryField);
       
       res.json({
-        products,
-        count: products.length
+        products: mappedProducts,
+        count: mappedProducts.length
       });
     } catch (error) {
       logger.error('Get products by category error:', error);
