@@ -32,85 +32,85 @@ def get_orders():
         logger.error(f'Get orders error: {str(e)}')
         return jsonify({'error': 'Failed to fetch orders'}), 500
 
-@bp.route('/', methods=['POST'])
-def create_order():
-    try:
-        user = get_user_from_token(request)
-        data = request.json
+# @bp.route('/', methods=['POST'])
+# def create_order():
+#     try:
+#         user = get_user_from_token(request)
+#         data = request.json
         
-        items = data.get('items', [])
-        shipping_address_id = data.get('shipping_address_id')
+#         items = data.get('items', [])
+#         shipping_address_id = data.get('shipping_address_id')
         
-        if not items:
-            return jsonify({'error': 'No items provided'}), 400
+#         if not items:
+#             return jsonify({'error': 'No items provided'}), 400
         
-        # Validate products and calculate total
-        total_amount = 0
-        order_items = []
+#         # Validate products and calculate total
+#         total_amount = 0
+#         order_items = []
         
-        for item in items:
-            product_id = item.get('product_id')
-            quantity = item.get('quantity', 1)
+#         for item in items:
+#             product_id = item.get('product_id')
+#             quantity = item.get('quantity', 1)
             
-            # Fetch product details
-            try:
-                response = requests.get(f'{PRODUCT_SERVICE_URL}/{product_id}', timeout=5)
-                if response.status_code != 200:
-                    return jsonify({'error': f'Product {product_id} not found'}), 404
+#             # Fetch product details
+#             try:
+#                 response = requests.get(f'{PRODUCT_SERVICE_URL}/{product_id}', timeout=5)
+#                 if response.status_code != 200:
+#                     return jsonify({'error': f'Product {product_id} not found'}), 404
                 
-                product = response.json()['product']
+#                 product = response.json()['product']
                 
-                if product['stock_quantity'] < quantity:
-                    return jsonify({'error': f'Insufficient stock for product {product_id}'}), 400
+#                 if product['stock_quantity'] < quantity:
+#                     return jsonify({'error': f'Insufficient stock for product {product_id}'}), 400
                 
-                unit_price = float(product['price'])
-                subtotal = unit_price * quantity
-                total_amount += subtotal
+#                 unit_price = float(product['price'])
+#                 subtotal = unit_price * quantity
+#                 total_amount += subtotal
                 
-                order_items.append({
-                    'product_id': product_id,
-                    'product_name': product['name'],
-                    'quantity': quantity,
-                    'unit_price': unit_price,
-                    'subtotal': subtotal
-                })
-            except requests.RequestException as e:
-                logger.error(f'Error fetching product {product_id}: {str(e)}')
-                return jsonify({'error': 'Failed to validate products'}), 503
+#                 order_items.append({
+#                     'product_id': product_id,
+#                     'product_name': product['name'],
+#                     'quantity': quantity,
+#                     'unit_price': unit_price,
+#                     'subtotal': subtotal
+#                 })
+#             except requests.RequestException as e:
+#                 logger.error(f'Error fetching product {product_id}: {str(e)}')
+#                 return jsonify({'error': 'Failed to validate products'}), 503
         
-        # Create order
-        order = Order.create(user['id'], order_items, total_amount, shipping_address_id)
+#         # Create order
+#         order = Order.create(user['id'], order_items, total_amount, shipping_address_id)
         
-        logger.info(f'Order created: {order["id"]} for user {user["id"]}')
+#         logger.info(f'Order created: {order["id"]} for user {user["id"]}')
         
-        # Send order confirmation notification (synchronous REST call)
-        try:
-            notification_payload = {
-                'type': 'order_confirmation',
-                'recipient': user['email'],
-                'payload': {
-                    'order_id': order['id'],
-                    'total_amount': total_amount
-                }
-            }
-            requests.post(
-                f'{NOTIFICATION_SERVICE_URL}/send',
-                json=notification_payload,
-                timeout=5
-            )
-            logger.info(f'Order confirmation notification sent for order {order["id"]}')
-        except requests.RequestException as e:
-            # Log but don't fail the order creation if notification fails
-            logger.warning(f'Failed to send order notification: {str(e)}')
+#         # Send order confirmation notification (synchronous REST call)
+#         try:
+#             notification_payload = {
+#                 'type': 'order_confirmation',
+#                 'recipient': user['email'],
+#                 'payload': {
+#                     'order_id': order['id'],
+#                     'total_amount': total_amount
+#                 }
+#             }
+#             requests.post(
+#                 f'{NOTIFICATION_SERVICE_URL}/send',
+#                 json=notification_payload,
+#                 timeout=5
+#             )
+#             logger.info(f'Order confirmation notification sent for order {order["id"]}')
+#         except requests.RequestException as e:
+#             # Log but don't fail the order creation if notification fails
+#             logger.warning(f'Failed to send order notification: {str(e)}')
         
-        return jsonify({
-            'message': 'Order created successfully',
-            'order': order
-        }), 201
+#         return jsonify({
+#             'message': 'Order created successfully',
+#             'order': order
+#         }), 201
         
-    except Exception as e:
-        logger.error(f'Create order error: {str(e)}')
-        return jsonify({'error': 'Failed to create order'}), 500
+#     except Exception as e:
+#         logger.error(f'Create order error: {str(e)}')
+#         return jsonify({'error': 'Failed to create order'}), 500
 
 @bp.route('/<int:order_id>', methods=['GET'])
 def get_order(order_id):
