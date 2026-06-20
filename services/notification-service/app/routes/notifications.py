@@ -5,7 +5,7 @@ from app.utils.logger import logger
 bp = Blueprint('notifications', __name__)
 email_service = EmailService()
 
-@bp.route('/send', methods=['POST'])
+@bp.route('/deliver', methods=['POST'])
 def send_notification():
     try:
         data = request.json
