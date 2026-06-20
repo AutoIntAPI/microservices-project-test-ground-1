@@ -36,7 +36,7 @@ class ProductController {
         return res.status(404).json({ error: 'Product not found' });
       }
       
-      res.json({ product });
+      res.json({ item: product });
     } catch (error) {
       logger.error('Get product error:', error);
       res.status(500).json({ error: 'Failed to fetch product' });
