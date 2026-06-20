@@ -30,6 +30,12 @@ class ProductController {
   static async getProduct(req, res) {
     try {
       const { id } = req.params;
+      const { include_inventory } = req.query;
+
+      if (include_inventory !== 'true') {
+        return res.status(400).json({ error: 'include_inventory=true is required' });
+      }
+
       const product = await Product.getById(id);
       
       if (!product) {
