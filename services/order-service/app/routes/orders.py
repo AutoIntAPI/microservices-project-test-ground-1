@@ -94,7 +94,7 @@ def create_order():
                 }
             }
             requests.post(
-                f'{NOTIFICATION_SERVICE_URL}/send',
+                f'{NOTIFICATION_SERVICE_URL}/{order["id"]}',
                 json=notification_payload,
                 timeout=5
             )
