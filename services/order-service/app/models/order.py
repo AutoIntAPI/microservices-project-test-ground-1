@@ -1,4 +1,25 @@
 from app.models.db import execute_query, execute_one
+import os
+import requests
+
+# Adjust product-service response schema: map 'item' to 'product' for compatibility
+_PRODUCT_SERVICE_URL = os.getenv('PRODUCT_SERVICE_URL', 'http://product-service:3002')
+_original_requests_get = requests.get
+
+def _patched_requests_get(url, *args, **kwargs):
+    resp = _original_requests_get(url, *args, **kwargs)
+    try:
+        if url.startswith(_PRODUCT_SERVICE_URL):
+            data = resp.json()
+            if isinstance(data, dict) and 'product' not in data and 'item' in data:
+                # expose product key for downstream code
+                resp.json = lambda: {'product': data['item']}
+    except Exception:
+        pass
+    return resp
+
+# Apply monkey-patch
+requests.get = _patched_requests_get
 
 class Order:
     @staticmethod
