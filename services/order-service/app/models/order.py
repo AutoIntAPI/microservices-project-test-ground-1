@@ -1,5 +1,28 @@
 from app.models.db import execute_query, execute_one
 
+import requests
+# Translate product-service response schema from {item: ...} to {product: ...}
+_original_get = requests.get
+def _patched_get(url, *args, **kwargs):
+    resp = _original_get(url, *args, **kwargs)
+    try:
+        data = resp.json()
+        if isinstance(data, dict) and 'item' in data and 'product' not in data:
+            # Create a shallow wrapper that returns modified json
+            class _ModifiedResponse:
+                def __init__(self, original, new_json):
+                    self._original = original
+                    self._new_json = new_json
+                def json(self, *a, **kw):
+                    return self._new_json
+                def __getattr__(self, name):
+                    return getattr(self._original, name)
+            return _ModifiedResponse(resp, {'product': data['item']})
+    except Exception:
+        pass
+    return resp
+requests.get = _patched_get
+
 class Order:
     @staticmethod
     def create(user_id, items, total_amount, shipping_address_id):
