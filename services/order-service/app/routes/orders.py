@@ -58,7 +58,10 @@ def create_order():
                 if response.status_code != 200:
                     return jsonify({'error': f'Product {product_id} not found'}), 404
                 
-                product = response.json()['product']
+                # The product-service now returns the data under the "item" key
+                product = response.json().get('item')
+                if not product:
+                    return jsonify({'error': f'Invalid product data for {product_id}'}), 500
                 
                 if product['stock_quantity'] < quantity:
                     return jsonify({'error': f'Insufficient stock for product {product_id}'}), 400
