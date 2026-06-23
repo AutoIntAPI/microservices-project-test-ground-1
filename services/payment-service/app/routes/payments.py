@@ -53,7 +53,7 @@ def process_payment():
                     }
                 }
                 requests.post(
-                    f'{NOTIFICATION_SERVICE_URL}/send',
+                    f'{NOTIFICATION_SERVICE_URL}/{transaction["transaction_id"]}',
                     json=notification_payload,
                     timeout=5
                 )
